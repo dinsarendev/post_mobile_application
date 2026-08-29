@@ -3,4 +3,5 @@ class UrlConstants {
   static const String baseUrl = "http://localhost:30033";
   static const String loginPath = "$baseUrl/api/oauth/token";
   static const String refreshTokenPath = "$baseUrl/api/oauth/refresh";
+  static const String adminListPostPath = "$baseUrl/api/app/post";
 }
