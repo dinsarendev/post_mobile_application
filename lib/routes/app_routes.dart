@@ -1,4 +1,8 @@
 import 'package:get/get.dart';
+import 'package:post_mobile_application/modules/admin/dashboard/binding/dashboard_binding.dart';
+import 'package:post_mobile_application/modules/admin/dashboard/view/dashboard_view.dart';
+import 'package:post_mobile_application/modules/admin/post/binding/post_binding.dart';
+import 'package:post_mobile_application/modules/admin/post/view/post_view.dart';
 import 'package:post_mobile_application/modules/auth/login/binding/login_binding.dart';
 import 'package:post_mobile_application/modules/auth/login/view/login_view.dart';
 import 'package:post_mobile_application/modules/home/binding/home_binding.dart';
@@ -14,6 +18,8 @@ class AppRoutes{
       GetPage(name: AppRouteName.splash, page: ()=> SplashView(), binding: SplashBinding()),
       GetPage(name: AppRouteName.home, page: ()=> HomeView(), binding: HomeBinding()),
       GetPage(name: AppRouteName.login, page: ()=> LoginView(), binding: LoginBinding()),
+      GetPage(name: AppRouteName.adminDashboard, page: ()=> DashboardView(), binding: DashboardBinding()),
+      GetPage(name: AppRouteName.adminPost, page: ()=> PostView(), binding: PostBinding()),
     ];
   }
 }
