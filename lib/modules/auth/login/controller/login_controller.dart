@@ -11,18 +11,19 @@ class LoginController extends GetxController{
 
   var usernameController = TextEditingController().obs;
   var passwordController = TextEditingController().obs;
+  var usernameError = Rx<String?>(null);
+  var passwordError = Rx<String?>(null);
   var loading = false.obs;
 
+  clearUsernameError() => usernameError.value = null;
+  clearPasswordError() => passwordError.value = null;
 
   onLogin() async {
     var username = usernameController.value.text.trim();
     var password = passwordController.value.text.trim();
-    if(username.isEmpty){
-      Get.snackbar("Error", "Please enter your username");
-      return;
-    }
-    if(password.isEmpty){
-      Get.snackbar("Error", "Please enter your password");
+    usernameError.value = username.isEmpty ? "Please enter your username" : null;
+    passwordError.value = password.isEmpty ? "Please enter your password" : null;
+    if (usernameError.value != null || passwordError.value != null) {
       return;
     }
     loading.value = true;
@@ -39,7 +40,7 @@ class LoginController extends GetxController{
       Get.snackbar("Success", "Login Successfully");
       Get.offNamed(AppRouteName.home);
     }else{
-      Get.snackbar("Success", "Your username and passowrd incorrect");
+      Get.snackbar("Error", "Your username and password are incorrect");
     }
   }
 }
