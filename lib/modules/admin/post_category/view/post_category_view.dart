@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:post_mobile_application/core/models/post/PostCategory.dart';
 import 'package:post_mobile_application/modules/admin/post_category/controller/post_category_controller.dart';
 import 'package:post_mobile_application/modules/admin/post_category/view/post_category_form_view.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 import 'package:post_mobile_application/widgets/appbar_custom_widget.dart';
 
 class PostCategoryView extends GetView<PostCategoryController> {
@@ -28,10 +29,11 @@ class PostCategoryView extends GetView<PostCategoryController> {
     );
     if (confirmed == true) {
       var success = await controller.deleteCategory(data.id!);
-      Get.snackbar(
-        success ? "Success" : "Error",
-        success ? "Category deleted successfully" : "Failed to delete category",
-      );
+      if (success) {
+        AppSnackbar.success("Category deleted successfully");
+      } else {
+        AppSnackbar.error("Failed to delete category");
+      }
     }
   }
 

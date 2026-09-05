@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:post_mobile_application/core/api/api_service.dart';
 import 'package:post_mobile_application/core/models/auth/register/RegisterRequest.dart';
 import 'package:post_mobile_application/routes/app_route_name.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 
 class RegisterController extends GetxController{
   final ApiService apiService;
@@ -76,10 +77,10 @@ class RegisterController extends GetxController{
     );
     loading.value = false;
     if(response.data != null) {
-      Get.snackbar("Success", "Register Successfully");
+      AppSnackbar.success("Register Successfully");
       Get.offNamed(AppRouteName.login);
     }else{
-      Get.snackbar("Error", response.message ?? "Register failed");
+      AppSnackbar.error(response.message ?? "Register failed");
     }
   }
 }

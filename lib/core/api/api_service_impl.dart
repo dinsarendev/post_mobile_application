@@ -7,6 +7,7 @@ import 'package:post_mobile_application/constants/api_constant.dart';
 import 'package:post_mobile_application/constants/url_constant.dart';
 import 'package:post_mobile_application/core/api/api_service.dart';
 import 'package:post_mobile_application/core/error/global_error_handler.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 import 'package:post_mobile_application/core/data/local/access_token_storage.dart';
 import 'package:post_mobile_application/core/models/auth/login/LoginRequest.dart';
 import 'package:post_mobile_application/core/models/auth/login/LoginResponse.dart';
@@ -36,29 +37,29 @@ class ApiServiceImpl implements ApiService {
     try {
       var response = await request().timeout(ApiConstants.connectionTimeout);
       if (response.statusCode >= 500) {
-        Get.snackbar(
-          "Server Error",
+        AppSnackbar.error(
           "The server encountered an error. Please try again later.",
+          title: "Server Error",
         );
         return null;
       }
       return response;
     } on TimeoutException {
-      Get.snackbar(
-        "Connection Timeout",
+      AppSnackbar.error(
         "The request took too long to respond. Please check your connection and try again.",
+        title: "Connection Timeout",
       );
       return null;
     } on SocketException {
-      Get.snackbar(
-        "No Internet Connection",
+      AppSnackbar.error(
         "Please check your internet connection and try again.",
+        title: "No Internet Connection",
       );
       return null;
     } on httpClient.ClientException {
-      Get.snackbar(
-        "Connection Error",
+      AppSnackbar.error(
         "Unable to reach the server. Please try again.",
+        title: "Connection Error",
       );
       return null;
     } catch (e, stack) {
@@ -178,7 +179,27 @@ class ApiServiceImpl implements ApiService {
       AccessTokenStorage.setRefreshToken(loginResponse.refreshToken ?? "");
       return true;
     }
+    AccessTokenStorage.clearTokens();
     return false;
+  }
+
+  @override
+  Future<bool> logout() async {
+    var userId = AccessTokenStorage.getUserId();
+    if (userId != null) {
+      headers["Authorization"] = "Bearer ${AccessTokenStorage.getAccessToken()}";
+      await _sendRequest(
+        () => httpClient.post(
+          Uri.parse(UrlConstants.logoutPath),
+          body: jsonEncode({"userId": userId}),
+          headers: headers,
+        ),
+      );
+    }
+    // Always clear the local session, even if the server call failed,
+    // so the user isn't stuck "logged in" on a flaky connection.
+    AccessTokenStorage.clearTokens();
+    return true;
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:post_mobile_application/binding/initail_binding.dart';
+import 'package:post_mobile_application/core/data/local/settings_storage.dart';
 import 'package:post_mobile_application/core/error/global_error_handler.dart';
 import 'package:post_mobile_application/routes/app_route_name.dart';
 import 'package:post_mobile_application/routes/app_routes.dart';
@@ -30,6 +31,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan),
       ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.cyan,
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: SettingsStorage.getDarkMode() ? ThemeMode.dark : ThemeMode.light,
     );
   }
 }

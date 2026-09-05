@@ -8,5 +8,6 @@ class AppRouteName {
   static const String adminDashboard = "/admin/dashboard";
   static const String adminPost = "/admin/posts";
   static const String adminPostCategory = "/admin/post-categories";
+  static const String settings = "/settings";
 
 }

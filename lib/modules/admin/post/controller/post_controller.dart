@@ -25,6 +25,8 @@ class PostController extends GetxController {
   var currentPage = 0.obs;
   var hasMore = true.obs;
   var searchKeyword = "".obs;
+  var selectedCategoryId = Rx<int?>(null);
+  var statusFilter = Rx<String?>("ACT");
 
   final searchController = TextEditingController();
   final scrollController = ScrollController();
@@ -41,8 +43,10 @@ class PostController extends GetxController {
     }
     var keyword = searchKeyword.value.trim();
     var keywordParam = keyword.isNotEmpty ? "&keyword=${Uri.encodeQueryComponent(keyword)}" : "";
+    var categoryParam = selectedCategoryId.value != null ? "&categoryId=${selectedCategoryId.value}" : "";
+    var statusParam = (statusFilter.value?.isNotEmpty ?? false) ? "&status=${statusFilter.value}" : "";
     var response = await apiService.get(
-      "${UrlConstants.adminListPostPath}?page=$page&size=$pageSize&status=ACT$keywordParam",
+      "${UrlConstants.adminListPostPath}?page=$page&size=$pageSize$statusParam$keywordParam$categoryParam",
     );
     dataLoading.value = false;
     loadingMore.value = false;
@@ -75,6 +79,24 @@ class PostController extends GetxController {
     });
   }
 
+  void onCategorySelected(int? categoryId) {
+    if (selectedCategoryId.value == categoryId) return;
+    selectedCategoryId.value = categoryId;
+    if (scrollController.hasClients) {
+      scrollController.jumpTo(0);
+    }
+    getAllPosts(reset: true);
+  }
+
+  void onStatusFilterChanged(String? status) {
+    if (statusFilter.value == status) return;
+    statusFilter.value = status;
+    if (scrollController.hasClients) {
+      scrollController.jumpTo(0);
+    }
+    getAllPosts(reset: true);
+  }
+
   void _onScroll() {
     if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
       loadMore();
@@ -98,6 +120,7 @@ class PostController extends GetxController {
     required String image,
     required int categoryId,
     required List<String> tags,
+    required String status,
   }) async {
     formLoading.value = true;
     var result = await apiService.post(
@@ -109,6 +132,7 @@ class PostController extends GetxController {
         image: image,
         categoryId: categoryId,
         tags: tags,
+        status: status,
       ).toJson(),
     );
     formLoading.value = false;
@@ -123,8 +147,11 @@ class PostController extends GetxController {
     required int id,
     required String title,
     required String description,
+    required String body,
     required String image,
     required int categoryId,
+    required List<String> tags,
+    required String status,
   }) async {
     formLoading.value = true;
     var result = await apiService.put(
@@ -132,8 +159,11 @@ class PostController extends GetxController {
       UpdatePostRequest(
         title: title,
         description: description,
+        body: body,
         image: image,
         categoryId: categoryId,
+        tags: tags,
+        status: status,
       ).toJson(),
     );
     formLoading.value = false;
@@ -142,6 +172,20 @@ class PostController extends GetxController {
       return true;
     }
     return false;
+  }
+
+  Future<bool> toggleStatus(Content data) async {
+    var newStatus = data.status == "ACT" ? "INACT" : "ACT";
+    return updatePost(
+      id: data.id!,
+      title: data.title ?? "",
+      description: data.description ?? "",
+      body: data.body ?? "",
+      image: data.image ?? "",
+      categoryId: data.postCategory?.id ?? 0,
+      tags: data.tags ?? [],
+      status: newStatus,
+    );
   }
 
   Future<String?> uploadPostImage({required List<int> bytes, required String filename}) async {

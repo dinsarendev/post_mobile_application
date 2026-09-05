@@ -6,6 +6,7 @@ import 'package:post_mobile_application/core/models/auth/forgot_password/ForgotP
 import 'package:post_mobile_application/core/models/auth/forgot_password/ResetPasswordRequest.dart';
 import 'package:post_mobile_application/core/models/auth/forgot_password/VerifyForgotPasswordOtpRequest.dart';
 import 'package:post_mobile_application/routes/app_route_name.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 
 class ForgotPasswordController extends GetxController {
   final ApiService apiService;
@@ -30,7 +31,7 @@ class ForgotPasswordController extends GetxController {
   onSendOtp() async {
     var phoneNumber = phoneNumberController.value.text.trim();
     if (phoneNumber.isEmpty) {
-      Get.snackbar("Error", "Please enter your phone number");
+      AppSnackbar.error("Please enter your phone number");
       return;
     }
     loading.value = true;
@@ -42,10 +43,10 @@ class ForgotPasswordController extends GetxController {
     );
     loading.value = false;
     if (response.success!) {
-      Get.snackbar("Success", response.message ?? "OTP sent successfully");
+      AppSnackbar.success(response.message ?? "OTP sent successfully");
       step.value = 1;
     } else {
-      Get.snackbar("Error", response.message ?? "Unable to send OTP");
+      AppSnackbar.error(response.message ?? "Unable to send OTP");
     }
   }
 
@@ -53,7 +54,7 @@ class ForgotPasswordController extends GetxController {
     var phoneNumber = phoneNumberController.value.text.trim();
     var otp = otpController.value.text.trim();
     if (otp.isEmpty) {
-      Get.snackbar("Error", "Please enter the OTP");
+      AppSnackbar.error("Please enter the OTP");
       return;
     }
     loading.value = true;
@@ -68,7 +69,7 @@ class ForgotPasswordController extends GetxController {
     if (response.success!) {
       step.value = 2;
     } else {
-      Get.snackbar("Error", response.message ?? "Invalid OTP");
+      AppSnackbar.error(response.message ?? "Invalid OTP");
     }
   }
 
@@ -78,11 +79,11 @@ class ForgotPasswordController extends GetxController {
     var newPassword = newPasswordController.value.text.trim();
     var confirmNewPassword = confirmNewPasswordController.value.text.trim();
     if (newPassword.isEmpty) {
-      Get.snackbar("Error", "Please enter your new password");
+      AppSnackbar.error("Please enter your new password");
       return;
     }
     if (newPassword != confirmNewPassword) {
-      Get.snackbar("Error", "Password and confirm password do not match");
+      AppSnackbar.error("Password and confirm password do not match");
       return;
     }
     loading.value = true;
@@ -97,10 +98,10 @@ class ForgotPasswordController extends GetxController {
     );
     loading.value = false;
     if (response.success!) {
-      Get.snackbar("Success", "Password reset successfully");
+      AppSnackbar.success("Password reset successfully");
       Get.offNamed(AppRouteName.login);
     } else {
-      Get.snackbar("Error", response.message ?? "Unable to reset password");
+      AppSnackbar.error(response.message ?? "Unable to reset password");
     }
   }
 }

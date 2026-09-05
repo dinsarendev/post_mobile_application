@@ -4,6 +4,7 @@ import 'package:post_mobile_application/core/api/api_service.dart';
 import 'package:post_mobile_application/core/data/local/access_token_storage.dart';
 import 'package:post_mobile_application/core/models/auth/login/LoginRequest.dart';
 import 'package:post_mobile_application/routes/app_route_name.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 
 class LoginController extends GetxController{
   final ApiService apiService;
@@ -37,10 +38,13 @@ class LoginController extends GetxController{
     if(response.accessToken != null) {
       AccessTokenStorage.setAccessToken(response.accessToken??"");
       AccessTokenStorage.setRefreshToken(response.refreshToken??"");
-      Get.snackbar("Success", "Login Successfully");
+      if (response.user?.id != null) {
+        AccessTokenStorage.setUserId(response.user!.id!);
+      }
+      AppSnackbar.success("Login Successfully");
       Get.offNamed(AppRouteName.home);
     }else{
-      Get.snackbar("Error", "Your username and password are incorrect");
+      AppSnackbar.error("Your username and password are incorrect");
     }
   }
 }

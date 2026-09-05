@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:post_mobile_application/core/models/post/Content.dart';
 import 'package:post_mobile_application/modules/admin/post/controller/post_controller.dart';
 import 'package:post_mobile_application/modules/admin/post/view/post_form_view.dart';
+import 'package:post_mobile_application/widgets/app_choice_chip.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 import 'package:post_mobile_application/widgets/appbar_custom_widget.dart';
 import 'package:post_mobile_application/widgets/input_form_custom.dart';
 
@@ -29,10 +31,21 @@ class PostView extends GetView<PostController> {
     );
     if (confirmed == true) {
       var success = await controller.deletePost(data.id!);
-      Get.snackbar(
-        success ? "Success" : "Error",
-        success ? "Post deleted successfully" : "Failed to delete post",
-      );
+      if (success) {
+        AppSnackbar.success("Post deleted successfully");
+      } else {
+        AppSnackbar.error("Failed to delete post");
+      }
+    }
+  }
+
+  Future<void> _onToggleStatusTap(Content data) async {
+    var activating = data.status != "ACT";
+    var success = await controller.toggleStatus(data);
+    if (success) {
+      AppSnackbar.success(activating ? "Post activated successfully" : "Post deactivated successfully");
+    } else {
+      AppSnackbar.error(activating ? "Failed to activate post" : "Failed to deactivate post");
     }
   }
 
@@ -57,6 +70,51 @@ class PostView extends GetView<PostController> {
                 prefixIcon: Icons.search,
                 onChanged: controller.onSearchChanged,
               ),
+              SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    AppChoiceChip(
+                      label: "Active",
+                      selected: controller.statusFilter.value == "ACT",
+                      onTap: () => controller.onStatusFilterChanged("ACT"),
+                    ),
+                    AppChoiceChip(
+                      label: "Inactive",
+                      selected: controller.statusFilter.value == "INACT",
+                      onTap: () => controller.onStatusFilterChanged("INACT"),
+                    ),
+                    AppChoiceChip(
+                      label: "All",
+                      selected: controller.statusFilter.value == null,
+                      onTap: () => controller.onStatusFilterChanged(null),
+                    ),
+                  ],
+                ),
+              ),
+              if (controller.categories.isNotEmpty)
+                SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      AppChoiceChip(
+                        label: "All Categories",
+                        selected: controller.selectedCategoryId.value == null,
+                        onTap: () => controller.onCategorySelected(null),
+                      ),
+                      ...controller.categories.map(
+                        (category) => AppChoiceChip(
+                          label: category.name ?? "",
+                          selected: controller.selectedCategoryId.value == category.id,
+                          onTap: () => controller.onCategorySelected(category.id),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 8),
               Expanded(
                 child: controller.dataLoading.value == true
                     ? Center(child: CircularProgressIndicator(color: Colors.cyan))
@@ -99,6 +157,16 @@ class PostView extends GetView<PostController> {
                                           style: TextStyle(fontSize: 18),
                                         ),
                                       ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          data.status == "ACT" ? "Active" : "Inactive",
+                                          style: TextStyle(
+                                            color: data.status == "ACT" ? Colors.green : Colors.grey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
                                       if (data.postCategory?.name != null)
                                         Align(
                                           alignment: Alignment.centerLeft,
@@ -126,6 +194,16 @@ class PostView extends GetView<PostController> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
+                                          IconButton(
+                                            icon: Icon(
+                                              data.status == "ACT"
+                                                  ? Icons.visibility_off_outlined
+                                                  : Icons.visibility_outlined,
+                                              color: Colors.orange,
+                                            ),
+                                            tooltip: data.status == "ACT" ? "Deactivate" : "Activate",
+                                            onPressed: () => _onToggleStatusTap(data),
+                                          ),
                                           IconButton(
                                             icon: const Icon(Icons.edit_outlined, color: Colors.cyan),
                                             onPressed: () =>

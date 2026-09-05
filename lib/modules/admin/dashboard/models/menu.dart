@@ -11,7 +11,7 @@ class Menu {
       Menu(id: 1,nameKm: "Posts",nameEn: "Posts", routeName: AppRouteName.adminPost),
       Menu(id: 2,nameKm: "Post Categories",nameEn: "Post Categories", routeName: AppRouteName.adminPostCategory),
       Menu(id: 3,nameKm: "Articles",nameEn: "Articles", routeName: AppRouteName.adminPost),
-      Menu(id: 4,nameKm: "Settings",nameEn: "Settings", routeName: AppRouteName.adminPost)
+      Menu(id: 4,nameKm: "Settings",nameEn: "Settings", routeName: AppRouteName.settings)
     ];
   }
 }

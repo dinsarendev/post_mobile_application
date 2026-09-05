@@ -7,6 +7,7 @@ import 'package:post_mobile_application/core/models/post/PostCategory.dart';
 import 'package:post_mobile_application/modules/admin/post_category/controller/post_category_controller.dart';
 import 'package:post_mobile_application/widgets/appbar_custom_widget.dart';
 import 'package:post_mobile_application/widgets/button_custom_widget.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 import 'package:post_mobile_application/widgets/image_picker_field.dart';
 import 'package:post_mobile_application/widgets/input_form_custom.dart';
 
@@ -54,7 +55,7 @@ class _PostCategoryFormViewState extends State<PostCategoryFormView> {
         imageUrl = uploadedUrl;
       });
     } else {
-      Get.snackbar("Error", "Failed to upload image");
+      AppSnackbar.error("Failed to upload image");
     }
   }
 
@@ -87,11 +88,11 @@ class _PostCategoryFormViewState extends State<PostCategoryFormView> {
     var name = nameController.text.trim();
     var image = imageUrl ?? "";
     if (name.isEmpty) {
-      Get.snackbar("Error", "Please enter the category name");
+      AppSnackbar.error("Please enter the category name");
       return;
     }
     if (image.isEmpty) {
-      Get.snackbar("Error", "Please select an image");
+      AppSnackbar.error("Please select an image");
       return;
     }
     var status = isActive ? "ACT" : "INACT";
@@ -110,9 +111,9 @@ class _PostCategoryFormViewState extends State<PostCategoryFormView> {
 
     if (success) {
       Get.back();
-      Get.snackbar("Success", isEditing ? "Category updated successfully" : "Category created successfully");
+      AppSnackbar.success(isEditing ? "Category updated successfully" : "Category created successfully");
     } else {
-      Get.snackbar("Error", isEditing ? "Failed to update category" : "Failed to create category");
+      AppSnackbar.error(isEditing ? "Failed to update category" : "Failed to create category");
     }
   }
 

@@ -4,7 +4,7 @@ import 'package:post_mobile_application/modules/home/controller/home_controller.
 class HomeBinding extends Bindings{
   @override
   void dependencies() {
-    Get.lazyPut(()=> HomeController());
+    Get.lazyPut(()=> HomeController(apiService: Get.find()));
   }
 
 }

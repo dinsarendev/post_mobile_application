@@ -7,6 +7,7 @@ import 'package:post_mobile_application/core/models/post/Content.dart';
 import 'package:post_mobile_application/modules/admin/post/controller/post_controller.dart';
 import 'package:post_mobile_application/widgets/appbar_custom_widget.dart';
 import 'package:post_mobile_application/widgets/button_custom_widget.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 import 'package:post_mobile_application/widgets/image_picker_field.dart';
 import 'package:post_mobile_application/widgets/input_form_custom.dart';
 
@@ -28,6 +29,7 @@ class _PostFormViewState extends State<PostFormView> {
   int? selectedCategoryId;
   String? imageUrl;
   Uint8List? pickedImageBytes;
+  bool isActive = true;
 
   bool get isEditing => widget.editingPost != null;
 
@@ -36,6 +38,7 @@ class _PostFormViewState extends State<PostFormView> {
     super.initState();
     selectedCategoryId = widget.editingPost?.postCategory?.id;
     imageUrl = widget.editingPost?.image;
+    isActive = (widget.editingPost?.status ?? "ACT") == "ACT";
     if (controller.categories.isEmpty) {
       controller.loadCategories();
     }
@@ -63,7 +66,7 @@ class _PostFormViewState extends State<PostFormView> {
         imageUrl = uploadedUrl;
       });
     } else {
-      Get.snackbar("Error", "Failed to upload image");
+      AppSnackbar.error("Failed to upload image");
     }
   }
 
@@ -96,18 +99,30 @@ class _PostFormViewState extends State<PostFormView> {
     var title = titleController.text.trim();
     var description = descriptionController.text.trim();
     var image = imageUrl ?? "";
+    var body = bodyController.text.trim();
     if (title.isEmpty || description.isEmpty) {
-      Get.snackbar("Error", "Please fill in the title and description");
+      AppSnackbar.error("Please fill in the title and description");
       return;
     }
     if (image.isEmpty) {
-      Get.snackbar("Error", "Please select an image");
+      AppSnackbar.error("Please select an image");
       return;
     }
     if (selectedCategoryId == null) {
-      Get.snackbar("Error", "Please select a category");
+      AppSnackbar.error("Please select a category");
       return;
     }
+    if (body.isEmpty) {
+      AppSnackbar.error("Please enter the post content");
+      return;
+    }
+
+    var status = isActive ? "ACT" : "INACT";
+    var tags = tagsController.text
+        .split(",")
+        .map((tag) => tag.trim())
+        .where((tag) => tag.isNotEmpty)
+        .toList();
 
     bool success;
     if (isEditing) {
@@ -115,20 +130,13 @@ class _PostFormViewState extends State<PostFormView> {
         id: widget.editingPost!.id!,
         title: title,
         description: description,
+        body: body,
         image: image,
         categoryId: selectedCategoryId!,
+        tags: tags,
+        status: status,
       );
     } else {
-      var body = bodyController.text.trim();
-      if (body.isEmpty) {
-        Get.snackbar("Error", "Please enter the post content");
-        return;
-      }
-      var tags = tagsController.text
-          .split(",")
-          .map((tag) => tag.trim())
-          .where((tag) => tag.isNotEmpty)
-          .toList();
       success = await controller.createPost(
         title: title,
         description: description,
@@ -136,14 +144,15 @@ class _PostFormViewState extends State<PostFormView> {
         image: image,
         categoryId: selectedCategoryId!,
         tags: tags,
+        status: status,
       );
     }
 
     if (success) {
       Get.back();
-      Get.snackbar("Success", isEditing ? "Post updated successfully" : "Post created successfully");
+      AppSnackbar.success(isEditing ? "Post updated successfully" : "Post created successfully");
     } else {
-      Get.snackbar("Error", isEditing ? "Failed to update post" : "Failed to create post");
+      AppSnackbar.error(isEditing ? "Failed to update post" : "Failed to create post");
     }
   }
 
@@ -173,12 +182,11 @@ class _PostFormViewState extends State<PostFormView> {
                     labelText: "Description",
                     hintText: "Short description",
                   ),
-                  if (!isEditing)
-                    InputFormCustom(
-                      controller: bodyController,
-                      labelText: "Content",
-                      hintText: "Full post content",
-                    ),
+                  InputFormCustom(
+                    controller: bodyController,
+                    labelText: "Content",
+                    hintText: "Full post content",
+                  ),
                   const SizedBox(height: 8),
                   Text("Image", style: TextStyle(color: Colors.grey.shade700)),
                   ImagePickerField(
@@ -187,12 +195,11 @@ class _PostFormViewState extends State<PostFormView> {
                     uploading: controller.uploadingImage.value,
                     onTap: onPickImageTap,
                   ),
-                  if (!isEditing)
-                    InputFormCustom(
-                      controller: tagsController,
-                      labelText: "Tags",
-                      hintText: "comma, separated, tags",
-                    ),
+                  InputFormCustom(
+                    controller: tagsController,
+                    labelText: "Tags",
+                    hintText: "comma, separated, tags",
+                  ),
                   const SizedBox(height: 8),
                   Text("Category", style: TextStyle(color: Colors.grey.shade700)),
                   const SizedBox(height: 8),
@@ -218,7 +225,15 @@ class _PostFormViewState extends State<PostFormView> {
                               .toList(),
                           onChanged: (value) => setState(() => selectedCategoryId = value),
                         ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text("Active"),
+                    value: isActive,
+                    activeThumbColor: Colors.cyan,
+                    onChanged: (value) => setState(() => isActive = value),
+                  ),
+                  const SizedBox(height: 24),
                   ButtonCustomWidget(
                     onClick: (controller.formLoading.value || controller.uploadingImage.value)
                         ? null

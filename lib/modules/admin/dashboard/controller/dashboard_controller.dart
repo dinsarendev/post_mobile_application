@@ -7,7 +7,6 @@ class DashboardController extends GetxController{
 
   @override
   void onInit() {
-    // TODO: implement onInit
     menuList.value = Menu.getAllMenus();
     super.onInit();
   }

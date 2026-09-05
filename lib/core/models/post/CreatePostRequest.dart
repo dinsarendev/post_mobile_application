@@ -5,7 +5,8 @@ class CreatePostRequest {
       this.body,
       this.image,
       this.categoryId,
-      this.tags,});
+      this.tags,
+      this.status,});
 
   CreatePostRequest.fromJson(dynamic json) {
     title = json['title'];
@@ -14,6 +15,7 @@ class CreatePostRequest {
     image = json['image'];
     categoryId = json['categoryId'];
     tags = json['tags'] != null ? json['tags'].cast<String>() : [];
+    status = json['status'];
   }
   String? title;
   String? description;
@@ -21,6 +23,7 @@ class CreatePostRequest {
   String? image;
   int? categoryId;
   List<String>? tags;
+  String? status;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -30,6 +33,7 @@ class CreatePostRequest {
     map['image'] = image;
     map['categoryId'] = categoryId;
     map['tags'] = tags;
+    map['status'] = status;
     return map;
   }
 

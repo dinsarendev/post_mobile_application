@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:post_mobile_application/widgets/app_snackbar.dart';
 
 /// Last line of defense for exceptions that no local try/catch handled:
 /// Flutter framework errors (build/layout/paint) and uncaught async errors
@@ -35,10 +36,7 @@ class GlobalErrorHandler {
   static void _showMessage(String message) {
     try {
       if (Get.context == null) return;
-      if (Get.isSnackbarOpen) {
-        Get.closeCurrentSnackbar();
-      }
-      Get.snackbar("Error", message);
+      AppSnackbar.error(message);
     } catch (_) {
       // Overlay not ready yet (e.g. error happened before the first frame).
     }

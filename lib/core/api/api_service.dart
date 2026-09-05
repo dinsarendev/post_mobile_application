@@ -14,6 +14,7 @@ abstract class ApiService {
   Future<ForgotPasswordResponse> verifyForgotPasswordOtp(VerifyForgotPasswordOtpRequest req);
   Future<ForgotPasswordResponse> resetPassword(ResetPasswordRequest req);
   Future<bool> refreshToken();
+  Future<bool> logout();
   Future<dynamic> get(String url);
   Future<dynamic> post(String url, Map<String, dynamic> body);
   Future<dynamic> put(String url, Map<String, dynamic> body);
